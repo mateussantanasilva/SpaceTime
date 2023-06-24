@@ -30,10 +30,8 @@ app.register(authRoutes)
 app.register(uploadRoutes)
 app.register(memoriesRoutes)
 
-app
-  .listen({
-    port: 3333,
-  })
-  .then(() => {
-    console.log('🚀 HTTP server running on http://localhost:3333')
-  })
+const port = process.env.PORT ? parseInt(process.env.PORT, 10) : 3333
+
+app.listen({ port }).then(() => {
+  console.log(`🚀 HTTP server running on port ${port}`)
+})
