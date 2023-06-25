@@ -1,6 +1,6 @@
 import { FastifyInstance } from 'fastify'
 import { randomUUID } from 'node:crypto'
-import { extname, resolve } from 'node:path'
+import path, { extname, resolve } from 'node:path'
 import { createWriteStream } from 'node:fs'
 import { pipeline } from 'node:stream'
 import { promisify } from 'node:util'
@@ -27,8 +27,10 @@ export default async function uploadRoutes(app: FastifyInstance) {
     const extension = extname(uploadedFile.filename)
     const fileName = fileId.concat(extension)
 
+    const uploadsDirectory =
+      process.env.UPLOADS_DIRECTORY || path.resolve(__dirname, '../../uploads')
     const writeStream = createWriteStream(
-      resolve(__dirname, '../../uploads', fileName), // standardizes the path for all operating systems
+      resolve(uploadsDirectory, fileName), // standardizes the path for all operating systems
     )
 
     await pump(uploadedFile.file, writeStream) // Streams are collections of data that are not loaded all at once.
