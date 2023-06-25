@@ -31,7 +31,8 @@ app.register(uploadRoutes)
 app.register(memoriesRoutes)
 
 const port = process.env.PORT ? parseInt(process.env.PORT, 10) : 3333
+const host = 'RENDER' in process.env ? `0.0.0.0` : `localhost`
 
-app.listen({ port }).then(() => {
-  console.log(`🚀 HTTP server running on port ${port}`)
+app.listen({ host, port }).then(() => {
+  console.log(`🚀 HTTP server running on host ${host} and port ${port}`)
 })
