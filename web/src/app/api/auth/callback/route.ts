@@ -1,5 +1,4 @@
 import { api } from '@/lib/api'
-import webAppBaseUrl from '@/lib/webAppBaseUrl'
 import { NextRequest, NextResponse } from 'next/server'
 
 export async function GET(request: NextRequest) {
@@ -13,9 +12,10 @@ export async function GET(request: NextRequest) {
   })
   const { token } = registerResponse.data
 
-  const redirectURL = redirectTo ?? new URL(webAppBaseUrl, request.url) // true ?? false
-  const oneMonthInSeconds = 60 * 60 * 24 * 30 // minute * hour * day * month
+  const redirectURL = redirectTo ?? new URL('/', request.url) // true ?? false
 
+  const oneMonthInSeconds = 60 * 60 * 24 * 30 // minute * hour * day * month
+  console.log(redirectURL, token)
   return NextResponse.redirect(redirectURL, {
     headers: {
       'Set-Cookie': `token=${token}; Path=/; max-age=${oneMonthInSeconds};`, // any route that starts with '/'
