@@ -48,6 +48,7 @@ export default async function Home() {
               alt="Imagem de memória criada"
               width={592}
               height={280}
+              loading="lazy"
               className="aspect-video w-full rounded-lg object-cover"
             ></Image>
 
