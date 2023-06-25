@@ -1,4 +1,5 @@
 import { api } from '@/lib/api'
+import webAppBaseUrl from '@/lib/webAppBaseUrl'
 import { NextRequest, NextResponse } from 'next/server'
 
 export async function GET(request: NextRequest) {
@@ -12,7 +13,7 @@ export async function GET(request: NextRequest) {
   })
   const { token } = registerResponse.data
 
-  const redirectURL = redirectTo ?? new URL('/', request.url) // true ?? false
+  const redirectURL = redirectTo ?? new URL(webAppBaseUrl, request.url) // true ?? false
   const oneMonthInSeconds = 60 * 60 * 24 * 30 // minute * hour * day * month
 
   return NextResponse.redirect(redirectURL, {

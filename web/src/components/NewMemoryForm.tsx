@@ -6,6 +6,7 @@ import { FormEvent } from 'react'
 import Cookie from 'js-cookie'
 import { api } from '@/lib/api'
 import { useRouter } from 'next/navigation'
+import webAppBaseUrl from '@/lib/webAppBaseUrl'
 
 export default function NewMemoryForm() {
   const router = useRouter()
@@ -49,7 +50,7 @@ export default function NewMemoryForm() {
       },
     )
 
-    router.push('/') // redirect to home page
+    router.push(webAppBaseUrl) // redirect to home page
   }
 
   return (
