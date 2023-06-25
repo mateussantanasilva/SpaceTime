@@ -23,7 +23,13 @@ export default function NewMemoryForm() {
       const uploadFormData = new FormData()
       uploadFormData.set('file', fileToUpload)
 
-      const fileUrlResponse = await api.post('/upload', uploadFormData)
+      const fileUrlResponse = await api
+        .post('/upload', uploadFormData)
+        .catch((error) => {
+          console.log('Código de status:', error.response.status)
+          console.log('Mensagem de erro:', error.message)
+          console.log('Dados de resposta:', error.response.data)
+        })
       coverUrl = fileUrlResponse?.data
     }
 
@@ -68,7 +74,6 @@ export default function NewMemoryForm() {
             id="isPublic"
             value="true"
             className="h-4 w-4 rounded border-gray-400 bg-gray-700 text-purple-500"
-            required
           />
           Tornar memória pública
         </label>
