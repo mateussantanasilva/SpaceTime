@@ -1,21 +1,16 @@
 import { FastifyInstance } from 'fastify'
 import { z } from 'zod'
-import { prisma } from '../lib/prisma'
+import memoriesRepository from '../repositories/memories'
 
 export default async function memoriesRoutes(app: FastifyInstance) {
+  const repository = await memoriesRepository()
+
   app.addHook('preHandler', async (request) => {
     await request.jwtVerify() // before request, check the jwt
   })
 
   app.get('/memories', async (request) => {
-    const memories = await prisma.memory.findMany({
-      where: {
-        userId: request.user.sub, // jwt identifier present in any request - specified in d.ts
-      },
-      orderBy: {
-        createdAt: 'asc',
-      },
-    })
+    const memories = await repository.getMemoriesByUser(request.user.sub)
 
     return memories.map((memory) => {
       return {
@@ -33,11 +28,7 @@ export default async function memoriesRoutes(app: FastifyInstance) {
 
     const { id } = paramsSchema.parse(request.params)
 
-    const memory = await prisma.memory.findUniqueOrThrow({
-      where: {
-        id,
-      },
-    })
+    const memory = await repository.getMemoryById(id)
 
     if (!memory.isPublic && memory.userId !== request.user.sub)
       return reply.status(401).send('Unauthorized for reading memory')
@@ -53,14 +44,13 @@ export default async function memoriesRoutes(app: FastifyInstance) {
     })
 
     const { content, coverUrl, isPublic } = bodySchema.parse(request.body)
+    const userId = request.user.sub
 
-    const memory = await prisma.memory.create({
-      data: {
-        content,
-        coverUrl,
-        isPublic,
-        userId: request.user.sub,
-      },
+    const memory = await repository.createMemory({
+      content,
+      coverUrl,
+      isPublic,
+      userId,
     })
 
     return memory
@@ -81,25 +71,20 @@ export default async function memoriesRoutes(app: FastifyInstance) {
 
     const { content, coverUrl, isPublic } = bodySchema.parse(request.body)
 
-    let memory = await prisma.memory.findUniqueOrThrow({
-      where: {
-        id,
-      },
-    })
+    let memory = await repository.getMemoryById(id)
 
     if (memory.userId !== request.user.sub)
       return reply.status(401).send('Unauthorized for reading memory')
 
-    memory = await prisma.memory.update({
-      where: {
-        id,
-      },
-      data: {
+    memory = await repository.updateMemory(
+      {
         content,
         coverUrl,
         isPublic,
+        userId: '',
       },
-    })
+      id,
+    )
 
     return memory
   })
@@ -111,19 +96,11 @@ export default async function memoriesRoutes(app: FastifyInstance) {
 
     const { id } = paramsSchema.parse(request.params)
 
-    const memory = await prisma.memory.findUniqueOrThrow({
-      where: {
-        id,
-      },
-    })
+    const memory = await repository.getMemoryById(id)
 
     if (memory.userId !== request.user.sub)
       return reply.status(401).send('Unauthorized for reading memory')
 
-    await prisma.memory.delete({
-      where: {
-        id,
-      },
-    })
+    await repository.getMemoryById(id)
   })
 }
